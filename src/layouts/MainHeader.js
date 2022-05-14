@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 function MainHeader() {
   const { isAuthenticated, user, logout } = useAuth();
   console.log(user);
-  console.log(user.name);
+;
 
   let navigate = useNavigate();
 
