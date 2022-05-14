@@ -8,8 +8,6 @@ import * as Yup from "yup";
 
 import useAuth from "../hooks/useAuth";
 
-import { toast } from "react-toastify";
-
 import {
   Alert,
   Container,
@@ -51,16 +49,18 @@ function LoginPage() {
   } = methods;
 
   const onSubmit = async (data) => {
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname || "/home";
     let { email, password } = data;
-    try {
-      await auth.login({ email, password }, () => {
-        navigate(from, { replace: true });
-      });
-    } catch (error) {
-      reset();
-      setError("responseError", error);
-    }
+    console.log(data);
+    console.log(auth);
+    // try {
+    await auth.login({ email, password }, () => {
+      navigate(from, { replace: true });
+    });
+    // } catch (error) {
+    //   reset();
+    //   setError("responseError", error);
+    // }
   };
 
   return (
@@ -104,7 +104,7 @@ function LoginPage() {
           </Stack>
           <Alert severity="info">
             Don't have account?
-            <Link variant="subtitle2" component={RouterLink} to="/register">
+            <Link variant="subtitle2" component={RouterLink} to="/">
               Sign up
             </Link>
           </Alert>
