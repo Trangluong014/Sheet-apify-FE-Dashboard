@@ -56,7 +56,7 @@ function RegisterPage() {
   } = methods;
 
   const onSubmit = async (data) => {
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname || "/login";
     let { name, email, password } = data;
     try {
       await auth.register({ name, email, password }, () => {

@@ -114,8 +114,7 @@ function AuthProvider({ children }) {
       password,
       role,
     });
-    const { user, accessToken } = response.data;
-    setSession(accessToken);
+    const { user } = response.data;
     dispatch({
       type: REGISTER_SUCCESS,
       payload: { user },

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import BlankLayout from "../layouts/BlankLayout";
@@ -17,17 +16,18 @@ function Router() {
   return (
     <Routes>
       <Route
+        path="/"
         element={
           <AuthRequire>
             <MainLayout />
           </AuthRequire>
         }
       >
-        <Route path="/" element={<HomePage />} />
+        <Route index element={<HomePage />} />
         <Route path="/website/:id" element={<DetailsPage />} />
         <Route path="/website/create" element={<WebCreatePage />} />
       </Route>
-      <Route path="/" element={<BlankLayout />}>
+      <Route element={<BlankLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />
