@@ -53,14 +53,14 @@ function LoginPage() {
     let { email, password } = data;
     console.log(data);
     console.log(auth);
-    // try {
-    await auth.login({ email, password }, () => {
-      navigate(from, { replace: true });
-    });
-    // } catch (error) {
-    //   reset();
-    //   setError("responseError", error);
-    // }
+    try {
+      await auth.login({ email, password }, () => {
+        navigate(from, { replace: true });
+      });
+    } catch (error) {
+      reset();
+      setError("responseError", error);
+    }
   };
 
   return (

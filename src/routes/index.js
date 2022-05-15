@@ -24,9 +24,10 @@ function Router() {
         }
       >
         <Route index element={<HomePage />} />
-        <Route path="/website/:id" element={<DetailsPage />} />
-        <Route path="/website/create" element={<WebCreatePage />} />
+        <Route path="website/create" element={<WebCreatePage />} />
+        <Route path="website/:websiteId" element={<DetailsPage />} />
       </Route>
+
       <Route element={<BlankLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
