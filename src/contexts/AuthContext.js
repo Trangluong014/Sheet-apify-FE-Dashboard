@@ -128,7 +128,7 @@ function AuthProvider({ children }) {
     dispatch({
       type: LOGOUT,
     });
-    callback();
+    if (callback) callback();
   };
   return (
     <AuthContext.Provider value={{ ...state, login, register, logout }}>

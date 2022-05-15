@@ -7,8 +7,12 @@ import {
   InputAdornment,
   Button,
   Pagination,
-  ListItemButton,
-  ListItemText,
+  Card,
+  CardHeader,
+  CardMedia,
+  CardContent,
+  CardActions,
+  IconButton,
 } from "@mui/material";
 
 import React, { useState, useEffect } from "react";
@@ -19,8 +23,12 @@ import { useForm } from "react-hook-form";
 import LoadingScreen from "../components/LoadingScreen";
 
 import { FormProvider, FTextField } from "../components/form";
-import { getWebsites } from "../features/websites/websiteSLice";
+import { getWebsites } from "../features/websites/websiteSlice";
 import { useNavigate } from "react-router-dom";
+import { getWebsiteUrl } from "../app/constants";
+
+import EditIcon from "@mui/icons-material/Edit";
+import noImage from "../components/no-image.png";
 
 function HomePage() {
   const [page, setPage] = useState(1);
@@ -53,17 +61,10 @@ function HomePage() {
 
   return (
     <Container>
-      <Stack sx={{ display: "flex", alignItems: "center", m: "2rem" }}>
-        <Typography variant="h3" sx={{ textAlign: "center" }}>
-          SHEETS-APIFY
-        </Typography>
-      </Stack>
-
       <FormProvider methods={methods}>
         {/* //search */}
         <FTextField
           name="search"
-          sx={{ width: 300 }}
           size="small"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -74,11 +75,12 @@ function HomePage() {
               </InputAdornment>
             ),
           }}
+          style={{ margin: "1rem" }}
         />
         {/* //sort */}
       </FormProvider>
 
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="column">
         <Box sx={{ position: "relative", height: 1 }}>
           {isLoading ? (
             <LoadingScreen />
@@ -87,28 +89,53 @@ function HomePage() {
               {error ? (
                 <Alert severity="error">{error}</Alert>
               ) : (
-                <Stack
-                  direction="column"
-                  spacing={2}
-                  justifyContent="space-around"
-                  flexWrap="wrap"
-                >
-                  {websites.map((website) => (
-                    <ListItemButton
-                      onClick={() => navigate(`/website/${website._id}`)}
-                    >
-                      <ListItemText>{website.name}</ListItemText>
-                    </ListItemButton>
-                  ))}
-                </Stack>
+                <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
+                  {websites?.length ? websites.map((website) => (
+                    <Box gridColumn="span 4" key={website._id}>
+                      <Card>
+                        <CardHeader
+                          title={website.name}
+                          subheader={website.websiteId}
+                        />
+
+                        <CardMedia>
+                          <img src={noImage} />
+                        </CardMedia>
+
+                        <CardContent>
+                          <Typography variant="body2" color="text.secondary">
+                            Last Updated: {new Date(parseInt(website.lastUpdate)).toLocaleString()}
+                          </Typography>
+                        </CardContent>
+                        <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Button 
+                            onClick={() => window.location.href = getWebsiteUrl(website)}
+                          >
+                            Visit Website
+                          </Button>
+                          <IconButton 
+                            onClick={() => navigate(`/website/${website.websiteId}`)}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </CardActions>
+                      </Card>
+                    </Box>
+                  )) : <></>}
+                </Box>
               )}
             </>
           )}
         </Box>
-        <Box sx={{ my: 3 }}>
+        <Box style={{ 
+          marginTop: "1rem",
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}>
           <Button
             variant="contained"
             onClick={() => navigate(`/website/create`)}
+            style={{ marginLeft: "auto", marginRight: "auto" }}
           >
             Create New Website
           </Button>

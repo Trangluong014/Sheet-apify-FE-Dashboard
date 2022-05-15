@@ -23,13 +23,13 @@ function Router() {
           </AuthRequire>
         }
       >
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/website/:id" element={<DetailsPage />} />
         <Route path="/website/create" element={<WebCreatePage />} />
       </Route>
       <Route path="/" element={<BlankLayout />}>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<RegisterPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

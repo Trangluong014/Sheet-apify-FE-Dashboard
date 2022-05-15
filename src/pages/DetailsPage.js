@@ -4,6 +4,10 @@ import {
   Breadcrumbs,
   Button,
   Card,
+  CardHeader,
+  CardMedia,
+  CardContent,
+  CardActions,
   Container,
   Divider,
   Grid,
@@ -11,18 +15,27 @@ import {
   Rating,
   Stack,
   Typography,
+  TextField,
+  InputAdornment,
+  IconButton,
+  FilledInput,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import React, { useEffect } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, Link as RouterLink } from "react-router-dom";
+import { useParams, Link as RouterLink, useNavigate } from "react-router-dom";
 import LoadingScreen from "../components/LoadingScreen";
-import { fCurrency } from "../utils/numberFormat";
 import noImage from "../components/no-image.png";
-import { getSingleWebsite } from "../features/websites/websiteSLice";
+import { getSingleWebsite, deleteSingleWebsite } from "../features/websites/websiteSlice";
+import { getWebsiteUrl } from "../app/constants";
+
+import LinkIcon from "@mui/icons-material/Link";
 
 function DetailPage() {
   const params = useParams();
+  const navigate = useNavigate();
   const { website, isloading, error } = useSelector((state) => state.website);
   const websiteId = params.id;
   console.log(params);
@@ -34,8 +47,6 @@ function DetailPage() {
 
   return (
     <Container sx={{ my: 3 }}>
-      <Typography color="text.primary">{website?.name}</Typography>
-
       <Box sx={{ position: "relative", height: 1 }}>
         {isloading ? (
           <LoadingScreen />
@@ -47,20 +58,59 @@ function DetailPage() {
               <>
                 {website ? (
                   <Card>
-                    <Grid container>
-                      <Typography variant="h5" paragraph>
-                        {website.name}
-                      </Typography>
+                    <CardHeader 
+                      title={`${website.name} (${website.websiteId})`}
+                      subheader={`Last updated: ${new Date(parseInt(website.lastUpdate)).toLocaleString()}`}
+                      action={
+                        <IconButton aria-label="Visit Website" onClick={() => window.location.href = getWebsiteUrl(website)}>
+                          <LinkIcon /> 
+                        </IconButton>
+                      }
+                    />
 
-                      <Divider sx={{ borderStyle: "dashed" }} />
-                      <Typography>{website.template}</Typography>
-                      <Divider sx={{ borderStyle: "dashed" }} />
-                      <Box sx={{ my: 3 }}>
-                        <Button variant="contained" onClick={() => {}}>
-                          Update Website
-                        </Button>
+                    <CardMedia>
+                      <img src={noImage} />
+                    </CardMedia>
+
+                    <CardContent>
+                      <Box sx={{ '& > :not(style)': { m: 1 } }}>
+                        <FormControl fullWidth sx={{ m: 1 }} variant="filled">
+                          <InputLabel>Template</InputLabel>
+                          <FilledInput
+                            disabled
+                            variant="outlined"
+                            value={website.template}
+                          />
+                        </FormControl>
+                        <FormControl fullWidth sx={{ m: 1 }} variant="filled">
+                          <InputLabel>Spreadsheet ID</InputLabel>
+                          <FilledInput
+                            disabled
+                            variant="outlined"
+                            value={website.spreadsheetId}
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <IconButton>
+                                  <LinkIcon />
+                                </IconButton>
+                              </InputAdornment>
+                            }
+                          />
+                        </FormControl>
                       </Box>
-                    </Grid>
+                    </CardContent>
+
+                    <CardActions style={{ justifyContent: 'space-between' }}>
+                      <Button onClick={() => {}}>
+                        Update Website
+                      </Button>
+                      <Button color="error" onClick={() => {
+                        dispatch(deleteSingleWebsite({ websiteId }))
+                        navigate("/");
+                      }}>
+                        Delete Website
+                      </Button>
+                    </CardActions>
                   </Card>
                 ) : (
                   <Typography variant="h6">Website not found!</Typography>

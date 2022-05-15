@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import websiteReducer from "../features/websites/websiteSLice";
+import websiteReducer from "../features/websites/websiteSlice";
 
 const rootReducer = { website: websiteReducer };
 

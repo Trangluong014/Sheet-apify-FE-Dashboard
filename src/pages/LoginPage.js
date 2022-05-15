@@ -49,7 +49,7 @@ function LoginPage() {
   } = methods;
 
   const onSubmit = async (data) => {
-    const from = location.state?.from?.pathname || "/home";
+    const from = location.state?.from?.pathname || "/";
     let { email, password } = data;
     console.log(data);
     console.log(auth);
@@ -104,7 +104,7 @@ function LoginPage() {
           </Stack>
           <Alert severity="info">
             Don't have account?
-            <Link variant="subtitle2" component={RouterLink} to="/">
+            <Link variant="subtitle2" component={RouterLink} to="/register">
               Sign up
             </Link>
           </Alert>

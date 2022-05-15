@@ -26,7 +26,7 @@ const slice = createSlice({
         state.status = "idle";
         state.isLoading = false;
         state.error = "";
-        state.websites = action.payload.webList;
+        state.websites = action.payload.websiteList;
         state.totalPage = action.payload.totalPage;
       })
       .addCase(getWebsites.rejected, (state, action) => {
@@ -44,9 +44,25 @@ const slice = createSlice({
         state.status = "idle";
         state.isLoading = false;
         state.error = "";
-        state.website = action.payload.web;
+        state.website = action.payload.website;
       })
       .addCase(getSingleWebsite.rejected, (state, action) => {
+        state.status = "fail";
+        state.isLoading = false;
+        state.error = action.error.message;
+      });
+    builder
+      .addCase(deleteSingleWebsite.pending, (state, action) => {
+        state.status = "loading";
+        state.isLoading = true;
+        state.error = "";
+      })
+      .addCase(deleteSingleWebsite.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.isLoading = false;
+        state.error = "";
+      })
+      .addCase(deleteSingleWebsite.rejected, (state, action) => {
         state.status = "fail";
         state.isLoading = false;
         state.error = action.error.message;
@@ -57,7 +73,14 @@ const slice = createSlice({
 export const getSingleWebsite = createAsyncThunk(
   "websites/getSingleWebsite",
   async ({ websiteId }) => {
-    const response = await apiService.get(`/web/single/${websiteId}`);
+    const response = await apiService.get(`/website/${websiteId}`);
+    return response.data.data;
+  }
+);
+export const deleteSingleWebsite = createAsyncThunk(
+  "websites/deleteSingleWebsite",
+  async ({ websiteId }) => {
+    const response = await apiService.delete(`/website/${websiteId}`);
     return response.data.data;
   }
 );
@@ -73,7 +96,7 @@ export const getWebsites = createAsyncThunk(
       page,
     };
 
-    const response = await apiService.get(`/web/all`, { params });
+    const response = await apiService.get(`/website`, { params });
     return response.data.data;
   }
 );
