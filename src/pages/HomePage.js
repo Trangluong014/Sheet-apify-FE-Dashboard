@@ -26,8 +26,9 @@ import { FormProvider, FTextField } from "../components/form";
 import { getWebsites } from "../features/websites/websiteSlice";
 import { useNavigate } from "react-router-dom";
 import { getWebsiteUrl } from "../app/constants";
-
+import apiService from "../app/apiService";
 import EditIcon from "@mui/icons-material/Edit";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import noImage from "../components/no-image.png";
 
 function HomePage() {
@@ -37,10 +38,6 @@ function HomePage() {
   const { websites, isLoading, totalPage, error } = useSelector(
     (state) => state.website
   );
-
-  /* //pagination */
-
-  /* //search */
 
   const defaultValues = {
     search: "",
@@ -58,6 +55,23 @@ function HomePage() {
       })
     );
   }, [dispatch, page, search]);
+
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const updateWebsite = async (websiteId) => {
+    try {
+      setIsUpdating(true);
+      await apiService.post(`/website/${websiteId}/update`)
+      dispatch(
+        getWebsites({
+          page,
+          search,
+        })
+      );
+      setIsUpdating(false);
+    }
+    catch {}
+  }
 
   return (
     <Container>
@@ -98,9 +112,9 @@ function HomePage() {
                           subheader={website.websiteId}
                         />
 
-                        <CardMedia>
-                          <img src={noImage} />
-                        </CardMedia>
+                        <CardContent>
+                          <img src={website?.config?.logo || noImage} />
+                        </CardContent>
 
                         <CardContent>
                           <Typography variant="body2" color="text.secondary">
@@ -113,11 +127,19 @@ function HomePage() {
                           >
                             Visit Website
                           </Button>
-                          <IconButton 
-                            onClick={() => navigate(`/website/${website.websiteId}`)}
-                          >
-                            <EditIcon />
-                          </IconButton>
+                          <Stack direction="row">
+                            <IconButton 
+                              onClick={() => updateWebsite(website.websiteId)}
+                              disabled={isUpdating}
+                            >
+                              <RefreshIcon />
+                            </IconButton>
+                            <IconButton 
+                              onClick={() => navigate(`/website/${website.websiteId}`)}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </Stack>
                         </CardActions>
                       </Card>
                     </Box>

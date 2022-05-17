@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { 
   Button, 
@@ -18,7 +18,9 @@ import {
   Select,
   FormControl,
   InputLabel,
+  Input,
 } from "@mui/material";
+import noImage from "../components/no-image.png";
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { FormProvider, FTextField, FRadioGroup, FSelect } from "../components/form";
@@ -26,6 +28,8 @@ import * as Yup from "yup";
 import apiService from "../app/apiService";
 import { useNavigate } from "react-router-dom";
 import { TEMPLATE_OPTIONS } from "../app/constants";
+import MonacoEditor from "../components/MonacoEditor";
+
 
 const URL_REGEX = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
 
@@ -35,6 +39,7 @@ const WebsiteSchema = Yup.object().shape({
   spreadsheetUrl: Yup.string().url().required("Spreadsheet Url is required").trim(),
   ranges:Yup.array(Yup.string().trim()).required("Data Range is required"),
   template:Yup.string().required("Template is required").trim(),
+  config: Yup.string().trim(),
 });
 
 const defaultValues = {
@@ -43,6 +48,7 @@ const defaultValues = {
   spreadsheetUrl: "",
   ranges: [],
   template: "template2",
+  config: "{}",
 };
 
 function WebCreatePage() {
@@ -50,6 +56,8 @@ function WebCreatePage() {
     resolver: yupResolver(WebsiteSchema),
     defaultValues,
   });
+  const logoInputRef = useRef(null);
+  const [logoInput, setLogoInput] = useState("");
 
   const {
     handleSubmit,
@@ -88,16 +96,43 @@ function WebCreatePage() {
       setRanges([]);
     }
   }, [setRanges]);
-  const onSubmit = useCallback((data) => {
+  const handleLogoChange = useCallback((e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader();
+
+      const onReaderLoad = function () {
+        setLogoInput(reader.result);
+      }
+      reader.addEventListener("load", onReaderLoad); 
+      reader.readAsDataURL(file);
+    }
+  }, [setLogoInput])
+  const onSubmit = useCallback(async (data) => {
+    const tryParse = (str) => {
+      try {
+        return JSON.parse(str);
+      }
+      catch {
+        return {};
+      }
+    }
     const submitData = async () => {
       try {
-        const response = await apiService.post("/website/create", data);
+        const createData = {
+          ...data,
+          config: {
+            ...tryParse(data.config),
+            logo: logoInput,
+          },
+        }
+        const response = await apiService.post("/website/create", createData);
         navigate("/", { replace: true });
       }
       catch {}
     }
     submitData();
-  }, []);
+  }, [logoInput]);
 
   return (
     <Container sx={{ my: 3 }}>
@@ -109,6 +144,27 @@ function WebCreatePage() {
               {!!errors.responseError && (
                 <Alert severity="error">{errors.responseError.message}</Alert>
               )}
+
+              <div>
+                <input 
+                  accept="image/*" 
+                  type="file" 
+                  style={{ display: "none" }}
+                  ref={logoInputRef}
+                  onChange={handleLogoChange}
+                />
+                {logoInput
+                  ? <img src={logoInput} alt="logo" />
+                  : <img src={noImage} alt="no logo" />}
+                <div>
+                  <Button variant="contained" onClick={() => {
+                    console.log("input ref", logoInputRef.current);
+                    logoInputRef.current && logoInputRef.current.click()
+                  }}>
+                    Upload Logo
+                  </Button>
+                </div>
+              </div>
 
               <Controller
                 name="websiteId"
@@ -190,6 +246,22 @@ function WebCreatePage() {
                   )}
                 />
                 : <></>}
+
+              <Typography variant="body1" gutterBottom>Configuration</Typography>
+              <Controller
+                name="config"
+                control={control}
+                render={({ field: {value, ...field}, fieldState: { error } }) => (
+                  <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                    <Input
+                      inputComponent={MonacoEditor}
+                      multiline
+                      height="250px"
+                      {...field}
+                    />
+                  </FormControl>
+                )}
+              />
 
             </Stack>
           </CardContent>
