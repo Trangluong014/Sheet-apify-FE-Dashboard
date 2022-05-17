@@ -9,7 +9,6 @@ import {
   Pagination,
   Card,
   CardHeader,
-  CardMedia,
   CardContent,
   CardActions,
   IconButton,
@@ -61,7 +60,7 @@ function HomePage() {
   const updateWebsite = async (websiteId) => {
     try {
       setIsUpdating(true);
-      await apiService.post(`/website/${websiteId}/update`)
+      await apiService.post(`/website/${websiteId}/update`);
       dispatch(
         getWebsites({
           page,
@@ -69,9 +68,8 @@ function HomePage() {
         })
       );
       setIsUpdating(false);
-    }
-    catch {}
-  }
+    } catch {}
+  };
 
   return (
     <Container>
@@ -103,57 +101,79 @@ function HomePage() {
               {error ? (
                 <Alert severity="error">{error}</Alert>
               ) : (
-                <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
-                  {websites?.length ? websites.map((website) => (
-                    <Box gridColumn="span 4" key={website._id}>
-                      <Card>
-                        <CardHeader
-                          title={website.name}
-                          subheader={website.websiteId}
-                        />
+                <Box
+                  display="grid"
+                  gridTemplateColumns="repeat(12, 1fr)"
+                  gap={2}
+                >
+                  {websites?.length ? (
+                    websites.map((website) => (
+                      <Box gridColumn="span 4" key={website._id}>
+                        <Card>
+                          <CardHeader
+                            title={website.name}
+                            subheader={website.websiteId}
+                          />
 
-                        <CardContent>
-                          <img src={website?.config?.logo || noImage} />
-                        </CardContent>
+                          <CardContent>
+                            <img src={website?.config?.logo || noImage} />
+                          </CardContent>
 
-                        <CardContent>
-                          <Typography variant="body2" color="text.secondary">
-                            Last Updated: {new Date(parseInt(website.lastUpdate)).toLocaleString()}
-                          </Typography>
-                        </CardContent>
-                        <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Button 
-                            onClick={() => window.location.href = getWebsiteUrl(website)}
+                          <CardContent>
+                            <Typography variant="body2" color="text.secondary">
+                              Last Updated:{" "}
+                              {new Date(
+                                parseInt(website.lastUpdate)
+                              ).toLocaleString()}
+                            </Typography>
+                          </CardContent>
+                          <CardActions
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
                           >
-                            Visit Website
-                          </Button>
-                          <Stack direction="row">
-                            <IconButton 
-                              onClick={() => updateWebsite(website.websiteId)}
-                              disabled={isUpdating}
+                            <Button
+                              onClick={() =>
+                                (window.location.href = getWebsiteUrl(website))
+                              }
                             >
-                              <RefreshIcon />
-                            </IconButton>
-                            <IconButton 
-                              onClick={() => navigate(`/website/${website.websiteId}`)}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </Stack>
-                        </CardActions>
-                      </Card>
-                    </Box>
-                  )) : <></>}
+                              Visit Website
+                            </Button>
+                            <Stack direction="row">
+                              <IconButton
+                                onClick={() => updateWebsite(website.websiteId)}
+                                disabled={isUpdating}
+                              >
+                                <RefreshIcon />
+                              </IconButton>
+                              <IconButton
+                                onClick={() =>
+                                  navigate(`/website/${website.websiteId}`)
+                                }
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Stack>
+                          </CardActions>
+                        </Card>
+                      </Box>
+                    ))
+                  ) : (
+                    <></>
+                  )}
                 </Box>
               )}
             </>
           )}
         </Box>
-        <Box style={{ 
-          marginTop: "1rem",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}>
+        <Box
+          style={{
+            marginTop: "1rem",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
           <Button
             variant="contained"
             onClick={() => navigate(`/website/create`)}
