@@ -12,6 +12,7 @@ import {
   CardContent,
   CardActions,
   IconButton,
+  Grid,
 } from "@mui/material";
 
 import React, { useState, useEffect } from "react";
@@ -115,8 +116,18 @@ function HomePage() {
                             subheader={website.websiteId}
                           />
 
-                          <CardContent>
-                            <img src={website?.config?.logo || noImage} />
+                          <CardContent
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <img
+                              src={website?.config?.logo || noImage}
+                              height="200"
+                              width="200"
+                              alt={website?.name}
+                            />
                           </CardContent>
 
                           <CardContent>

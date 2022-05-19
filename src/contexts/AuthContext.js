@@ -70,7 +70,7 @@ function AuthProvider({ children }) {
           setSession(accessToken);
 
           const response = await apiService.get("/admin/me/profile");
-          const user = response.data.data;
+          const user = response.data.data.user;
 
           dispatch({
             type: INITIALIZE,

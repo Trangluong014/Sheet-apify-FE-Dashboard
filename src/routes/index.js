@@ -9,6 +9,7 @@ import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
 
 import RegisterPage from "../pages/RegisterPage";
+import UserAccount from "../pages/UserAccount";
 import WebCreatePage from "../pages/WebCreatePage";
 import AuthRequire from "./AuthRequire";
 
@@ -26,6 +27,7 @@ function Router() {
         <Route index element={<HomePage />} />
         <Route path="website/create" element={<WebCreatePage />} />
         <Route path="website/:websiteId" element={<DetailsPage />} />
+        <Route path="user" element={<UserAccount />} />
       </Route>
 
       <Route element={<BlankLayout />}>

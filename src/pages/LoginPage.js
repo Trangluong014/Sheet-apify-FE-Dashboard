@@ -105,6 +105,7 @@ function LoginPage() {
           <Alert severity="info">
             Don't have account?
             <Link variant="subtitle2" component={RouterLink} to="/register">
+              {" "}
               Sign up
             </Link>
           </Alert>
@@ -115,6 +116,7 @@ function LoginPage() {
           type="submit"
           variant="contained"
           loading={isSubmitting}
+          sx={{ mt: 2 }}
         >
           Login
         </LoadingButton>
