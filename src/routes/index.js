@@ -5,6 +5,7 @@ import MainLayout from "../layouts/MainLayout";
 import DetailsPage from "../pages/DetailsPage";
 
 import HomePage from "../pages/HomePage";
+import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
 
@@ -16,8 +17,9 @@ import AuthRequire from "./AuthRequire";
 function Router() {
   return (
     <Routes>
+      <Route index element={<LandingPage />} />
       <Route
-        path="/"
+        path="/home"
         element={
           <AuthRequire>
             <MainLayout />
@@ -25,9 +27,9 @@ function Router() {
         }
       >
         <Route index element={<HomePage />} />
-        <Route path="website/create" element={<WebCreatePage />} />
-        <Route path="website/:websiteId" element={<DetailsPage />} />
-        <Route path="user" element={<UserAccount />} />
+        <Route path="/home/website/create" element={<WebCreatePage />} />
+        <Route path="/home/website/:websiteId" element={<DetailsPage />} />
+        <Route path="/home/user" element={<UserAccount />} />
       </Route>
 
       <Route element={<BlankLayout />}>

@@ -114,7 +114,7 @@ function WebsiteEditForm({ websiteId, website, ranges }) {
             `/website/${websiteId}`,
             patchData
           );
-          navigate("/", { replace: true });
+          navigate("/home", { replace: true });
         } catch {}
       };
       submitData();
@@ -274,7 +274,7 @@ function WebsiteEditForm({ websiteId, website, ranges }) {
             color="error"
             onClick={() => {
               dispatch(deleteSingleWebsite(params));
-              navigate("/");
+              navigate("/home");
             }}
           >
             Delete Website

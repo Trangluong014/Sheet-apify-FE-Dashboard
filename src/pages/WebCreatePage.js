@@ -1,11 +1,11 @@
 import { useCallback, useState, useRef } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { 
-  Button, 
-  Typography, 
+import {
+  Button,
+  Typography,
   Container,
   Card,
-  CardHeader, 
+  CardHeader,
   CardContent,
   CardActions,
   Stack,
@@ -23,22 +23,34 @@ import {
 import noImage from "../components/no-image.png";
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import { FormProvider, FTextField, FRadioGroup, FSelect } from "../components/form";
+import {
+  FormProvider,
+  FTextField,
+  FRadioGroup,
+  FSelect,
+} from "../components/form";
 import * as Yup from "yup";
 import apiService from "../app/apiService";
 import { useNavigate } from "react-router-dom";
 import { TEMPLATE_OPTIONS } from "../app/constants";
 import MonacoEditor from "../components/MonacoEditor";
 
-
-const URL_REGEX = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+const URL_REGEX =
+  /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
 
 const WebsiteSchema = Yup.object().shape({
-  websiteId: Yup.string().trim().lowercase().matches(/^[a-z0-9.\-_]+$/).required("Name is required"),
+  websiteId: Yup.string()
+    .trim()
+    .lowercase()
+    .matches(/^[a-z0-9.\-_]+$/)
+    .required("Name is required"),
   name: Yup.string().required("Display name is required").trim(),
-  spreadsheetUrl: Yup.string().url().required("Spreadsheet Url is required").trim(),
-  ranges:Yup.array(Yup.string().trim()).required("Data Range is required"),
-  template:Yup.string().required("Template is required").trim(),
+  spreadsheetUrl: Yup.string()
+    .url()
+    .required("Spreadsheet Url is required")
+    .trim(),
+  ranges: Yup.array(Yup.string().trim()).required("Data Range is required"),
+  template: Yup.string().required("Template is required").trim(),
   config: Yup.string().trim(),
 });
 
@@ -69,70 +81,85 @@ function WebCreatePage() {
 
   const navigate = useNavigate();
   const [ranges, setRanges] = useState([]);
-  const setWebsiteName = useCallback(({ onChange }) => (e) => {
-    const value = e?.target?.value?.toLowerCase() || ""
-    e.target.value = value;
-    onChange(e)
-  }, []);
+  const setWebsiteName = useCallback(
+    ({ onChange }) =>
+      (e) => {
+        const value = e?.target?.value?.toLowerCase() || "";
+        e.target.value = value;
+        onChange(e);
+      },
+    []
+  );
 
-  const getRanges = useCallback(async (spreadsheet_url) => {
-    try {
-      const response = await apiService.get(`/google/spreadsheet/sheet`, { params: {
-        spreadsheet_url,
-      }})
-      setRanges(response?.data?.data);
-    }
-    catch {}
-  }, [setRanges])
-
-  const setSpreadsheetUrl = useCallback(({ onChange }) => (e) => {
-    onChange(e);
-    const spreadsheet_url = e?.target?.value;
-    
-    if (spreadsheet_url.match(URL_REGEX)) {
-      getRanges(spreadsheet_url);
-    }
-    else {
-      setRanges([]);
-    }
-  }, [setRanges]);
-  const handleLogoChange = useCallback((e) => {
-    const file = e.target.files[0]
-    if (file) {
-      const reader = new FileReader();
-
-      const onReaderLoad = function () {
-        setLogoInput(reader.result);
-      }
-      reader.addEventListener("load", onReaderLoad); 
-      reader.readAsDataURL(file);
-    }
-  }, [setLogoInput])
-  const onSubmit = useCallback(async (data) => {
-    const tryParse = (str) => {
+  const getRanges = useCallback(
+    async (spreadsheet_url) => {
       try {
-        return JSON.parse(str);
-      }
-      catch {
-        return {};
-      }
-    }
-    const submitData = async () => {
-      try {
-        const createData = {
-          ...data,
-          config: {
-            ...tryParse(data.config),
-            logo: logoInput,
+        const response = await apiService.get(`/google/spreadsheet/sheet`, {
+          params: {
+            spreadsheet_url,
           },
+        });
+        setRanges(response?.data?.data);
+      } catch {}
+    },
+    [setRanges]
+  );
+
+  const setSpreadsheetUrl = useCallback(
+    ({ onChange }) =>
+      (e) => {
+        onChange(e);
+        const spreadsheet_url = e?.target?.value;
+
+        if (spreadsheet_url.match(URL_REGEX)) {
+          getRanges(spreadsheet_url);
+        } else {
+          setRanges([]);
         }
-        const response = await apiService.post("/website/create", createData);
-        navigate("/", { replace: true });
+      },
+    [setRanges]
+  );
+  const handleLogoChange = useCallback(
+    (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        const onReaderLoad = function () {
+          setLogoInput(reader.result);
+        };
+        reader.addEventListener("load", onReaderLoad);
+        reader.readAsDataURL(file);
       }
-      catch {}
-    }
-    submitData();
-  }, [logoInput]);
+    },
+    [setLogoInput]
+  );
+  const onSubmit = useCallback(
+    async (data) => {
+      const tryParse = (str) => {
+        try {
+          return JSON.parse(str);
+        } catch {
+          return {};
+        }
+      };
+      const submitData = async () => {
+        try {
+          const createData = {
+            ...data,
+            config: {
+              ...tryParse(data.config),
+              logo: logoInput,
+            },
+          };
+          const response = await apiService.post("/website/create", createData);
+          navigate("/home", { replace: true });
+        } catch {}
+      };
+      submitData();
+    },
+    [logoInput]
+  );
 
   return (
     <Container sx={{ my: 3 }}>
@@ -146,21 +173,26 @@ function WebCreatePage() {
               )}
 
               <div>
-                <input 
-                  accept="image/*" 
-                  type="file" 
+                <input
+                  accept="image/*"
+                  type="file"
                   style={{ display: "none" }}
                   ref={logoInputRef}
                   onChange={handleLogoChange}
                 />
-                {logoInput
-                  ? <img src={logoInput} alt="logo" />
-                  : <img src={noImage} alt="no logo" />}
+                {logoInput ? (
+                  <img src={logoInput} alt="logo" />
+                ) : (
+                  <img src={noImage} alt="no logo" />
+                )}
                 <div>
-                  <Button variant="contained" onClick={() => {
-                    console.log("input ref", logoInputRef.current);
-                    logoInputRef.current && logoInputRef.current.click()
-                  }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      console.log("input ref", logoInputRef.current);
+                      logoInputRef.current && logoInputRef.current.click();
+                    }}
+                  >
                     Upload Logo
                   </Button>
                 </div>
@@ -172,7 +204,7 @@ function WebCreatePage() {
                 render={({ field, fieldState: { error } }) => (
                   <TextField
                     required
-                    name="websiteId" 
+                    name="websiteId"
                     label="Website Name"
                     variant="filled"
                     fullWidth
@@ -184,20 +216,20 @@ function WebCreatePage() {
                 )}
               />
 
-              <FTextField 
+              <FTextField
                 required
-                name="name" 
+                name="name"
                 label="Display Name"
                 variant="filled"
               />
 
               <FormLabel>Template</FormLabel>
-              <FRadioGroup 
-                name="template" 
+              <FRadioGroup
+                name="template"
                 options={Object.keys(TEMPLATE_OPTIONS)}
                 getOptionLabel={(option) => TEMPLATE_OPTIONS[option].component}
                 labelProps={{
-                  labelPlacement: "top"
+                  labelPlacement: "top",
                 }}
               />
 
@@ -207,7 +239,7 @@ function WebCreatePage() {
                 render={({ field, fieldState: { error } }) => (
                   <TextField
                     required
-                    name="spreadsheetUrl" 
+                    name="spreadsheetUrl"
                     label="Google Sheet URL"
                     variant="filled"
                     fullWidth
@@ -215,23 +247,25 @@ function WebCreatePage() {
                     error={!!error}
                     helperText={error?.message}
                     onChange={setSpreadsheetUrl(field)}
-
                   />
                 )}
               />
 
-              {ranges.length 
-                ? <Controller
+              {ranges.length ? (
+                <Controller
                   name="ranges"
                   control={control}
-                  render={({ field: {value, ...field}, fieldState: { error } }) => (
+                  render={({
+                    field: { value, ...field },
+                    fieldState: { error },
+                  }) => (
                     <FormControl>
                       <InputLabel id="ranges-label">Ranges</InputLabel>
                       <Select
                         labelId="ranges-label"
                         required
                         multiple
-                        renderValue={(selected) => selected.join(', ')}
+                        renderValue={(selected) => selected.join(", ")}
                         value={value}
                         {...field}
                       >
@@ -245,13 +279,20 @@ function WebCreatePage() {
                     </FormControl>
                   )}
                 />
-                : <></>}
+              ) : (
+                <></>
+              )}
 
-              <Typography variant="body1" gutterBottom>Configuration</Typography>
+              <Typography variant="body1" gutterBottom>
+                Configuration
+              </Typography>
               <Controller
                 name="config"
                 control={control}
-                render={({ field: {value, ...field}, fieldState: { error } }) => (
+                render={({
+                  field: { value, ...field },
+                  fieldState: { error },
+                }) => (
                   <FormControl fullWidth sx={{ m: 1 }} variant="standard">
                     <Input
                       inputComponent={MonacoEditor}
@@ -262,16 +303,17 @@ function WebCreatePage() {
                   </FormControl>
                 )}
               />
-
             </Stack>
           </CardContent>
           <CardActions>
-            <Button disabled={isSubmitting} type="submit">Create</Button>
+            <Button disabled={isSubmitting} type="submit">
+              Create
+            </Button>
           </CardActions>
         </FormProvider>
       </Card>
     </Container>
-  )
+  );
 }
 
 export default WebCreatePage;

@@ -89,8 +89,8 @@ function UserAccount() {
             company: data.company,
             avatar: avatarInput,
           };
-          const response = await apiService.put(`/me/profile/update`, putData);
-          navigate("/", { replace: true });
+          const response = await apiService.put(`/admin/profile`, putData);
+          navigate("/home", { replace: true });
         } catch {}
       };
       submitData();
@@ -99,8 +99,8 @@ function UserAccount() {
   );
 
   const handleDeactivate = async () => {
-    const response = await apiService.delete(`/profile/deactive`);
-    navigate("/");
+    const response = await apiService.delete(`/admin/deactive`);
+    navigate("/home");
   };
 
   const handleAvatarChange = useCallback(

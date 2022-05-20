@@ -160,7 +160,7 @@ function HomePage() {
                               </IconButton>
                               <IconButton
                                 onClick={() =>
-                                  navigate(`/website/${website.websiteId}`)
+                                  navigate(`/home/website/${website.websiteId}`)
                                 }
                               >
                                 <EditIcon />
@@ -187,7 +187,7 @@ function HomePage() {
         >
           <Button
             variant="contained"
-            onClick={() => navigate(`/website/create`)}
+            onClick={() => navigate(`/home/website/create`)}
             style={{ marginLeft: "auto", marginRight: "auto" }}
           >
             Create New Website
