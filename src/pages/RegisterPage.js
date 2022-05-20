@@ -10,10 +10,6 @@ import useAuth from "../hooks/useAuth";
 
 import {
   Alert,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
   Container,
   IconButton,
   InputAdornment,
@@ -75,128 +71,79 @@ function RegisterPage() {
   };
 
   return (
-    <Container>
-      <Stack
-        display="flex"
-        flexDirection="row"
-        justifyContent="center"
-        alignItems="center"
-        height="50vh"
-      >
-        <Stack width="30vw" height="50vh">
-          <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={1.5}>
-              {!!errors.responseError && (
-                <Alert severity="error">{errors.responseError.message}</Alert>
-              )}
-              <Typography sx={{ fontSize: "2em", textAlign: "center" }}>
-                Create Account
-              </Typography>
-              <IconButton sx={{ alignSelf: "center", width: "1.5em" }}>
-                <GoogleIcon />
-              </IconButton>
-              <Typography>or use your email for registration</Typography>
-              <FTextField name="name" label="Name" />
-              <FTextField name="email" label="Email address" />
-              <FTextField
-                name="password"
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
-                        {showPassword ? (
-                          <VisibilityIcon />
-                        ) : (
-                          <VisibilityOffIcon />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <FTextField
-                name="passwordConfirmation"
-                label="Password Confirmation"
-                type={showPasswordConfirmation ? "text" : "password"}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() =>
-                          setShowPasswordConfirmation(!showPasswordConfirmation)
-                        }
-                        edge="end"
-                      >
-                        {showPasswordConfirmation ? (
-                          <VisibilityIcon />
-                        ) : (
-                          <VisibilityOffIcon />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <LoadingButton
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-                loading={isSubmitting}
-              >
-                Register
-              </LoadingButton>
-            </Stack>
-          </FormProvider>
-        </Stack>
-        <Stack
-          display="flex"
-          flexDirection="column"
-          justifyContent="space-around"
-          alignItems="center"
-          width="30vw"
-          height="50vh"
-        >
-          <Card
-            elevation={0}
-            sx={{
-              backgroundColor: "rgba(58, 53, 65, 0.87)",
-              alignItems: "center",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
+    <Container maxWidth="xs">
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3}>
+          {!!errors.responseError && (
+            <Alert severity="error">{errors.responseError.message}</Alert>
+          )}
+          <Typography sx={{ fontSize: "2em", textAlign: "center" }}>
+            Create Account
+          </Typography>
+          <IconButton sx={{ alignSelf: "center", width: "1.5em" }}>
+            <GoogleIcon />
+          </IconButton>
+          <Typography>or use your email for registration</Typography>
+          <FTextField name="name" label="Name" />
+          <FTextField name="email" label="Email address" />
+          <FTextField
+            name="password"
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
+          />
+          <FTextField
+            name="passwordConfirmation"
+            label="Password Confirmation"
+            type={showPasswordConfirmation ? "text" : "password"}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() =>
+                      setShowPasswordConfirmation(!showPasswordConfirmation)
+                    }
+                    edge="end"
+                  >
+                    {showPasswordConfirmation ? (
+                      <VisibilityIcon />
+                    ) : (
+                      <VisibilityOffIcon />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <LoadingButton
+            fullWidth
+            size="large"
+            type="submit"
+            variant="contained"
+            loading={isSubmitting}
           >
-            <CardContent>
-              <Typography
-                sx={{ fontSize: "2em", color: "#fff", textAlign: "center" }}
-                mb={2}
-              >
-                Welcome Back!
-              </Typography>
-              <Typography sx={{ color: "#fff", textAlign: "center" }}>
-                To keep connected with us please login with your personal info
-              </Typography>
-            </CardContent>
-            <CardActions sx={{ justifyContent: "center" }}>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  navigate("/login");
-                }}
-              >
-                Sign In
-              </Button>
-            </CardActions>
-          </Card>
+            Register
+          </LoadingButton>
+          <Alert severity="info">
+            Already have an account?{" "}
+            <Link variant="subtitle2" component={RouterLink} to="/login">
+              {" "}
+              Sign in
+            </Link>
+          </Alert>
         </Stack>
-      </Stack>
+      </FormProvider>
     </Container>
   );
 }

@@ -1,8 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 import "../index.css";
 
 function LandingPage() {
+  const navigate = useNavigate();
   return (
     <div className="container">
       <section id="intro">
@@ -13,7 +15,14 @@ function LandingPage() {
             Real-time update, user-friendly and free with no coding
           </p>
 
-          <button className="btn">Start building for free</button>
+          <button
+            className="btn"
+            onClick={() => {
+              navigate("/register");
+            }}
+          >
+            Start building for free
+          </button>
         </div>
         <a href="about" className="what">
           What is sheets-apify
@@ -129,7 +138,14 @@ function LandingPage() {
       </section>
       <section id="cta" className="style2">
         <h2 className="title4">Sound good?</h2>
-        <button className="btn">Start building for free</button>
+        <button
+          className="btn"
+          onClick={() => {
+            navigate("/register");
+          }}
+        >
+          Start building for free
+        </button>
       </section>
       <footer id="footer">
         <ul className="menu">
