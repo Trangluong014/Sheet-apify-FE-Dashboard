@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Button,
@@ -19,6 +19,9 @@ import {
   FormControl,
   InputLabel,
   Input,
+  Grid,
+  Link,
+  Breadcrumbs,
 } from "@mui/material";
 import noImage from "../components/no-image.png";
 import React from "react";
@@ -34,6 +37,8 @@ import apiService from "../app/apiService";
 import { useNavigate } from "react-router-dom";
 import { TEMPLATE_OPTIONS } from "../app/constants";
 import MonacoEditor from "../components/MonacoEditor";
+
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 const URL_REGEX =
   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
@@ -68,6 +73,7 @@ function WebCreatePage() {
     resolver: yupResolver(WebsiteSchema),
     defaultValues,
   });
+  const [step, setStep] = useState(0);
   const logoInputRef = useRef(null);
   const [logoInput, setLogoInput] = useState("");
 
@@ -76,8 +82,27 @@ function WebCreatePage() {
     reset,
     setError,
     control,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = methods;
+
+  const watchRanges = watch("ranges", []);
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name === "template") {
+        const template = TEMPLATE_OPTIONS[value.template];
+        if (template) {
+          setValue("config", template.defaultConfig || "{}", {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setValue]);
 
   const navigate = useNavigate();
   const [ranges, setRanges] = useState([]);
@@ -162,157 +187,239 @@ function WebCreatePage() {
   );
 
   return (
-    <Container sx={{ my: 3 }}>
-      <Card>
-        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-          <CardHeader title="Create Website" />
-          <CardContent>
-            <Stack spacing={3}>
-              {!!errors.responseError && (
-                <Alert severity="error">{errors.responseError.message}</Alert>
-              )}
-
-              <div>
-                <input
-                  accept="image/*"
-                  type="file"
-                  style={{ display: "none" }}
-                  ref={logoInputRef}
-                  onChange={handleLogoChange}
-                />
-                {logoInput ? (
-                  <img src={logoInput} alt="logo" />
-                ) : (
-                  <img src={noImage} alt="no logo" />
-                )}
-                <div>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      console.log("input ref", logoInputRef.current);
-                      logoInputRef.current && logoInputRef.current.click();
-                    }}
-                  >
-                    Upload Logo
-                  </Button>
-                </div>
-              </div>
-
-              <Controller
-                name="websiteId"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    required
-                    name="websiteId"
-                    label="Website Name"
-                    variant="filled"
-                    fullWidth
-                    {...field}
-                    error={!!error}
-                    helperText={error?.message}
-                    onChange={setWebsiteName(field)}
-                  />
-                )}
-              />
-
-              <FTextField
-                required
-                name="name"
-                label="Display Name"
-                variant="filled"
-              />
-
-              <FormLabel>Template</FormLabel>
-              <FRadioGroup
-                name="template"
-                options={Object.keys(TEMPLATE_OPTIONS)}
-                getOptionLabel={(option) => TEMPLATE_OPTIONS[option].component}
-                labelProps={{
-                  labelPlacement: "top",
-                }}
-              />
-
-              <Controller
-                name="spreadsheetUrl"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    required
-                    name="spreadsheetUrl"
-                    label="Google Sheet URL"
-                    variant="filled"
-                    fullWidth
-                    {...field}
-                    error={!!error}
-                    helperText={error?.message}
-                    onChange={setSpreadsheetUrl(field)}
-                  />
-                )}
-              />
-
-              {ranges.length ? (
-                <Controller
-                  name="ranges"
-                  control={control}
-                  render={({
-                    field: { value, ...field },
-                    fieldState: { error },
-                  }) => (
-                    <FormControl>
-                      <InputLabel id="ranges-label">Ranges</InputLabel>
-                      <Select
-                        labelId="ranges-label"
-                        required
-                        multiple
-                        renderValue={(selected) => selected.join(", ")}
-                        value={value}
-                        {...field}
-                      >
-                        {ranges.map((name) => (
-                          <MenuItem key={name} value={name}>
-                            <Checkbox checked={value.indexOf(name) > -1} />
-                            <ListItemText primary={name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
-              ) : (
-                <></>
-              )}
-
-              <Typography variant="body1" gutterBottom>
-                Configuration
-              </Typography>
-              <Controller
-                name="config"
-                control={control}
-                render={({
-                  field: { value, ...field },
-                  fieldState: { error },
-                }) => (
-                  <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                    <Input
-                      inputComponent={MonacoEditor}
-                      multiline
-                      height="250px"
-                      {...field}
+    <>
+      <Grid container sx={{ py: 4, bgcolor: "background.paper" }}>
+        <Breadcrumbs
+          sx={{
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+          separator={<NavigateNextIcon fontSize="small" />}
+        >
+          <Link sx={{ fontWeight: step === 0 ? 600 : 400 }}>Data Source</Link>
+          <Link sx={{ fontWeight: step === 1 ? 600 : 400 }}>Display</Link>
+          <Link sx={{ fontWeight: step === 2 ? 600 : 400 }}>Configuration</Link>
+        </Breadcrumbs>
+        {!!errors.responseError && (
+          <Alert severity="error">{errors.responseError.message}</Alert>
+        )}
+      </Grid>
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        {step === 0 && (
+          <Grid container>
+            <Grid item xs={12} sx={{ p: 3, bgcolor: "background.paper" }}>
+              <Card elevation={0}>
+                <CardContent>
+                  <Stack spacing={3}>
+                    <FormLabel>Template</FormLabel>
+                    <FRadioGroup
+                      name="template"
+                      options={Object.keys(TEMPLATE_OPTIONS)}
+                      getOptionLabel={(option) =>
+                        TEMPLATE_OPTIONS[option].component
+                      }
+                      labelProps={{
+                        labelPlacement: "top",
+                      }}
                     />
-                  </FormControl>
-                )}
-              />
-            </Stack>
-          </CardContent>
-          <CardActions>
-            <Button disabled={isSubmitting} type="submit">
-              Create
-            </Button>
-          </CardActions>
-        </FormProvider>
-      </Card>
-    </Container>
+                    <Controller
+                      name="spreadsheetUrl"
+                      control={control}
+                      render={({ field, fieldState: { error } }) => (
+                        <TextField
+                          required
+                          name="spreadsheetUrl"
+                          label="Google Sheet URL"
+                          variant="filled"
+                          fullWidth
+                          {...field}
+                          error={!!error}
+                          helperText={error?.message}
+                          onChange={setSpreadsheetUrl(field)}
+                        />
+                      )}
+                    />
+
+                    {ranges.length ? (
+                      <Controller
+                        name="ranges"
+                        control={control}
+                        render={({
+                          field: { value, ...field },
+                          fieldState: { error },
+                        }) => (
+                          <FormControl>
+                            <InputLabel variant="filled" id="ranges-label">
+                              Ranges
+                            </InputLabel>
+                            <Select
+                              labelId="ranges-label"
+                              required
+                              multiple
+                              renderValue={(selected) => selected.join(", ")}
+                              value={value}
+                              {...field}
+                            >
+                              {ranges.map((name) => (
+                                <MenuItem key={name} value={name}>
+                                  <Checkbox
+                                    checked={value.indexOf(name) > -1}
+                                  />
+                                  <ListItemText primary={name} />
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                      />
+                    ) : (
+                      <></>
+                    )}
+                  </Stack>
+                </CardContent>
+                <CardActions
+                  sx={{ flexDirection: "row", justifyContent: "flex-end" }}
+                >
+                  <Button
+                    disabled={!Boolean(watchRanges?.length)}
+                    primary
+                    onClick={() => setStep(1)}
+                    sx={{ mx: 3 }}
+                  >
+                    Next
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          </Grid>
+        )}
+
+        {step === 1 && (
+          <Grid container>
+            <Grid item xs={12} sx={{ p: 3, bgcolor: "background.paper" }}>
+              <Card>
+                <CardContent>
+                  <Stack spacing={3}>
+                    <div>
+                      <input
+                        accept="image/*"
+                        type="file"
+                        style={{ display: "none" }}
+                        ref={logoInputRef}
+                        onChange={handleLogoChange}
+                      />
+                      {logoInput ? (
+                        <img src={logoInput} alt="logo" />
+                      ) : (
+                        <img src={noImage} alt="no logo" />
+                      )}
+                      <div>
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            console.log("input ref", logoInputRef.current);
+                            logoInputRef.current &&
+                              logoInputRef.current.click();
+                          }}
+                        >
+                          Upload Logo
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Controller
+                      name="websiteId"
+                      control={control}
+                      render={({ field, fieldState: { error } }) => (
+                        <TextField
+                          required
+                          name="websiteId"
+                          label="Website Name"
+                          variant="filled"
+                          fullWidth
+                          {...field}
+                          error={!!error}
+                          helperText={error?.message}
+                          onChange={setWebsiteName(field)}
+                        />
+                      )}
+                    />
+
+                    <FTextField
+                      required
+                      name="name"
+                      label="Display Name"
+                      variant="filled"
+                    />
+                  </Stack>
+                </CardContent>
+
+                <CardActions
+                  sx={{ flexDirection: "row", justifyContent: "flex-end" }}
+                >
+                  <Button
+                    color="secondary"
+                    onClick={() => setStep(0)}
+                    sx={{ mx: 3 }}
+                  >
+                    Previous
+                  </Button>
+                  <Button primary onClick={() => setStep(2)} sx={{ mx: 3 }}>
+                    Next
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          </Grid>
+        )}
+
+        {step === 2 && (
+          <Grid container>
+            <Grid item xs={12} sx={{ p: 3, bgcolor: "background.paper" }}>
+              <Card>
+                <CardContent>
+                  <Stack spacing={3}>
+                    <Typography variant="body1" gutterBottom>
+                      Configuration
+                    </Typography>
+                    <Controller
+                      name="config"
+                      control={control}
+                      render={({
+                        field: { ...field },
+                        fieldState: { error },
+                      }) => (
+                        <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                          <Input
+                            inputComponent={MonacoEditor}
+                            multiline
+                            {...field}
+                          />
+                        </FormControl>
+                      )}
+                    />
+                  </Stack>
+                </CardContent>
+                <CardActions
+                  sx={{ flexDirection: "row", justifyContent: "flex-end" }}
+                >
+                  <Button
+                    color="secondary"
+                    onClick={() => setStep(1)}
+                    sx={{ mx: 3 }}
+                  >
+                    Previous
+                  </Button>
+                  <Button primary disabled={isSubmitting} type="submit">
+                    Create
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          </Grid>
+        )}
+      </FormProvider>
+    </>
   );
 }
 

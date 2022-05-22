@@ -79,60 +79,72 @@ function LoginPage() {
           <Typography sx={{ fontSize: "2em", textAlign: "center" }}>
             Sign In
           </Typography>
-          <IconButton sx={{ alignSelf: "center", width: "1.5em" }}>
-            <GoogleIcon />
-          </IconButton>
-          <Typography>or use your account</Typography>
+          <Card>
+            <CardContent>
+              <Stack spacing={3}>
+                <IconButton sx={{ alignSelf: "center", width: "1.5em" }}>
+                  <GoogleIcon />
+                </IconButton>
+                <Typography style={{ textAlign: "center" }}>
+                  or use your account
+                </Typography>
 
-          <FTextField name="email" label="Email address" />
+                <FTextField name="email" label="Email address" />
 
-          <FTextField
-            name="password"
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ my: 2 }}
-          >
-            <FCheckbox name="remember" label="Remember me" />
-            <Link component={RouterLink} variant="subtitle2" to="/">
+                <FTextField
+                  name="password"
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? (
+                            <VisibilityIcon />
+                          ) : (
+                            <VisibilityOffIcon />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  sx={{ my: 2 }}
+                >
+                  <FCheckbox name="remember" label="Remember me" />
+                  <Link component={RouterLink} variant="subtitle2" to="/">
+                    {" "}
+                    Forgot password?
+                  </Link>
+                </Stack>
+                <LoadingButton
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  loading={isSubmitting}
+                  sx={{ mb: 3 }}
+                >
+                  Login
+                </LoadingButton>
+              </Stack>
+            </CardContent>
+          </Card>
+          <Alert severity="info">
+            Don't have an account?{" "}
+            <Link variant="subtitle2" component={RouterLink} to="/register">
               {" "}
-              Forgot password?
+              Sign up
             </Link>
-          </Stack>
+          </Alert>
         </Stack>
-        <LoadingButton
-          fullWidth
-          size="large"
-          type="submit"
-          variant="contained"
-          loading={isSubmitting}
-          sx={{ mb: 3 }}
-        >
-          Login
-        </LoadingButton>
-        <Alert severity="info">
-          Don't have account?{" "}
-          <Link variant="subtitle2" component={RouterLink} to="/register">
-            {" "}
-            Sign up
-          </Link>
-        </Alert>
       </FormProvider>
     </Container>
   );

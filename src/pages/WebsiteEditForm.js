@@ -25,6 +25,8 @@ import {
   ListItemText,
   Input,
   CardActionArea,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import React, {
   useEffect,
@@ -55,6 +57,32 @@ import LinkIcon from "@mui/icons-material/Link";
 import { yupResolver } from "@hookform/resolvers/yup";
 import MonacoEditor from "../components/MonacoEditor";
 
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
+      style={{ display: "flex", flex: 1 }}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3, overflow: "hidden", flex: 1 }}>{children}</Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `vertical-tab-${index}`,
+    "aria-controls": `vertical-tabpanel-${index}`,
+  };
+}
+
 const WebsiteSchema = Yup.object().shape({
   name: Yup.string().required("Display name is required").trim(),
   ranges: Yup.array(Yup.string().trim()).required("Data Range is required"),
@@ -64,6 +92,7 @@ const WebsiteSchema = Yup.object().shape({
 function WebsiteEditForm({ websiteId, website, ranges }) {
   const logoInputRef = useRef(null);
   const [logoInput, setLogoInput] = useState(website?.config?.logo);
+  const [tab, setTab] = useState(0);
 
   const params = useMemo(() => ({ websiteId }), [websiteId]);
 
@@ -140,147 +169,181 @@ function WebsiteEditForm({ websiteId, website, ranges }) {
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      <Card>
-        <CardHeader
-          title={`${website.name} (${website.websiteId})`}
-          subheader={`Last updated: ${new Date(
-            parseInt(website.lastUpdate)
-          ).toLocaleString()}`}
-          action={
-            <IconButton
-              aria-label="Visit Website"
-              onClick={() => (window.location.href = getWebsiteUrl(website))}
-            >
-              <LinkIcon />
-            </IconButton>
-          }
-        />
+      <Grid container sx={{ bgcolor: "background.paper" }}>
+        <Grid item xs={3} spacing={0}>
+          <Tabs
+            orientation="vertical"
+            variant="scrollable"
+            value={tab}
+            onChange={(_, newValue) => setTab(newValue)}
+            sx={{ borderRight: 1, borderColor: "divider" }}
+          >
+            <Tab label="Overview" {...a11yProps(0)} />
+            <Tab label="Data Source" {...a11yProps(1)} />
+            <Tab label="Configuration" {...a11yProps(1)} />
+            <Tab label="Moderation" {...a11yProps(2)} />
+          </Tabs>
+        </Grid>
 
-        <CardContent>
-          <input
-            accept="image/*"
-            type="file"
-            style={{ display: "none" }}
-            ref={logoInputRef}
-            onChange={handleLogoChange}
-          />
-          {logoInput ? (
-            <img src={logoInput} alt="logo" />
-          ) : (
-            <img src={noImage} alt="no logo" />
-          )}
-          <div>
-            <Button
-              variant="contained"
-              onClick={() => {
-                console.log("input ref", logoInputRef.current);
-                logoInputRef.current && logoInputRef.current.click();
-              }}
-            >
-              Upload Logo
-            </Button>
-          </div>
-        </CardContent>
-
-        <CardContent>
-          <Box sx={{ "& > :not(style)": { m: 1 } }}>
-            <FormControl fullWidth sx={{ m: 1 }} variant="filled">
-              <InputLabel>Template</InputLabel>
-              <FilledInput
-                disabled
-                variant="outlined"
-                value={website.template}
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ m: 1 }} variant="filled">
-              <InputLabel>Spreadsheet ID</InputLabel>
-              <FilledInput
-                disabled
-                variant="outlined"
-                value={website.spreadsheetId}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton>
-                      <LinkIcon />
-                    </IconButton>
-                  </InputAdornment>
+        <Grid item xs={9}>
+          <TabPanel value={tab} index={0}>
+            <Card elevation={0}>
+              <CardHeader
+                title={`${website.name} (${website.websiteId})`}
+                subheader={`Last updated: ${new Date(
+                  parseInt(website.lastUpdate)
+                ).toLocaleString()}`}
+                action={
+                  <IconButton
+                    aria-label="Visit Website"
+                    onClick={() =>
+                      (window.location.href = getWebsiteUrl(website))
+                    }
+                  >
+                    <LinkIcon />
+                  </IconButton>
                 }
               />
-            </FormControl>
-
-            <FTextField
-              required
-              name="name"
-              label="Display Name"
-              variant="outlined"
-            />
-
-            <Controller
-              name="ranges"
-              control={control}
-              render={({
-                field: { value, ...field },
-                fieldState: { error },
-              }) => (
-                <FormControl fullWidth sx={{ m: 1 }} variant="outlined">
-                  <InputLabel id="ranges-label">Ranges</InputLabel>
-                  <Select
-                    labelId="ranges-label"
-                    required
-                    multiple
-                    renderValue={(selected) => selected.join(", ")}
-                    value={value}
-                    {...field}
+              <CardContent>
+                <input
+                  accept="image/*"
+                  type="file"
+                  style={{ display: "none" }}
+                  ref={logoInputRef}
+                  onChange={handleLogoChange}
+                />
+                {logoInput ? (
+                  <img src={logoInput} alt="logo" />
+                ) : (
+                  <img src={noImage} alt="no logo" />
+                )}
+                <div>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      console.log("input ref", logoInputRef.current);
+                      logoInputRef.current && logoInputRef.current.click();
+                    }}
                   >
-                    {ranges.map((name) => (
-                      <MenuItem key={name} value={name}>
-                        <Checkbox checked={value.indexOf(name) > -1} />
-                        <ListItemText primary={name} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
+                    Upload Logo
+                  </Button>
+                </div>
+              </CardContent>
+              <CardContent>
+                <FTextField
+                  required
+                  name="name"
+                  label="Display Name"
+                  variant="outlined"
+                />
+              </CardContent>
+            </Card>
+          </TabPanel>
 
-            <Typography variant="body1" gutterBottom>
-              Configuration
-            </Typography>
-            <Controller
-              name="config"
-              control={control}
-              render={({
-                field: { value, ...field },
-                fieldState: { error },
-              }) => (
-                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                  <Input
-                    inputComponent={MonacoEditor}
-                    multiline
-                    height="250px"
-                    {...field}
+          <TabPanel value={tab} index={1}>
+            <Card elevation={0}>
+              <CardContent>
+                <FormControl fullWidth sx={{ m: 1 }} variant="filled">
+                  <InputLabel>Template</InputLabel>
+                  <FilledInput
+                    disabled
+                    variant="outlined"
+                    value={website.template}
                   />
                 </FormControl>
-              )}
-            />
-          </Box>
-        </CardContent>
+                <FormControl fullWidth sx={{ m: 1 }} variant="filled">
+                  <InputLabel>Spreadsheet ID</InputLabel>
+                  <FilledInput
+                    disabled
+                    variant="outlined"
+                    value={website.spreadsheetId}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton>
+                          <LinkIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+                </FormControl>
+                <Controller
+                  name="ranges"
+                  control={control}
+                  render={({
+                    field: { value, ...field },
+                    fieldState: { error },
+                  }) => (
+                    <FormControl fullWidth sx={{ m: 1 }} variant="outlined">
+                      <InputLabel variant="filled" id="ranges-label">
+                        Ranges
+                      </InputLabel>
+                      <Select
+                        labelId="ranges-label"
+                        required
+                        multiple
+                        renderValue={(selected) => selected.join(", ")}
+                        value={value}
+                        {...field}
+                      >
+                        {ranges.map((name) => (
+                          <MenuItem key={name} value={name}>
+                            <Checkbox checked={value.indexOf(name) > -1} />
+                            <ListItemText primary={name} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                />
+              </CardContent>
+            </Card>
+          </TabPanel>
 
-        <CardActions style={{ justifyContent: "space-between" }}>
-          <Button disabled={isSubmitting} type="submit">
-            Update Website
-          </Button>
-          <Button
-            color="error"
-            onClick={() => {
-              dispatch(deleteSingleWebsite(params));
-              navigate("/home");
-            }}
-          >
-            Delete Website
-          </Button>
-        </CardActions>
-      </Card>
+          <TabPanel value={tab} index={2}>
+            <Card elevation={0}>
+              <CardContent>
+                <Typography variant="body1" gutterBottom>
+                  Configuration
+                </Typography>
+                <Controller
+                  name="config"
+                  control={control}
+                  render={({ field: { ...field }, fieldState: { error } }) => (
+                    <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                      <Input
+                        inputComponent={MonacoEditor}
+                        multiline
+                        height="250px"
+                        {...field}
+                      />
+                    </FormControl>
+                  )}
+                />
+              </CardContent>
+            </Card>
+          </TabPanel>
+
+          <TabPanel value={tab} index={3}>
+            <Card elevation={0}>
+              <Button
+                color="error"
+                onClick={() => {
+                  dispatch(deleteSingleWebsite(params));
+                  navigate("/home");
+                }}
+              >
+                Delete Website
+              </Button>
+            </Card>
+          </TabPanel>
+        </Grid>
+      </Grid>
+
+      <div style={{ textAlign: "right", marginTop: "1rem" }}>
+        <Button disabled={isSubmitting} type="submit">
+          Update Website
+        </Button>
+      </div>
     </FormProvider>
   );
 }

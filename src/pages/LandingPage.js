@@ -20,6 +20,7 @@ function LandingPage() {
             onClick={() => {
               navigate("/register");
             }}
+            style={{ marginTop: "1.5rem" }}
           >
             Start building for free
           </button>
@@ -47,13 +48,6 @@ function LandingPage() {
       </section>
       <section id="highlight" className="style1">
         <section className="inner">
-          <div className="pic">
-            <img
-              alt=""
-              width="100%"
-              src="https://images-wixmp-530a50041672c69d335ba4cf.wixmp.com/templates/image/5bf41cca049f03cdc7e842db2201172d6cc1a6b173e8db293a3b880ecc5836561616582409012.jpg"
-            />
-          </div>
           <div className="content">
             <h2 className="title3"> Real-time Update</h2>
             <p className="details3">
@@ -63,13 +57,6 @@ function LandingPage() {
           </div>
         </section>
         <section className="inner">
-          <div className="pic">
-            <img
-              alt=""
-              width="100%"
-              src="https://images-wixmp-530a50041672c69d335ba4cf.wixmp.com/templates/image/5bf41cca049f03cdc7e842db2201172d6cc1a6b173e8db293a3b880ecc5836561616582409012.jpg"
-            />
-          </div>
           <div className="content">
             <h2 className="title3"> User-friendly</h2>
             <p className="details3">
@@ -79,13 +66,6 @@ function LandingPage() {
           </div>
         </section>
         <section className="inner">
-          <div className="pic">
-            <img
-              alt=""
-              width="100%"
-              src="https://images-wixmp-530a50041672c69d335ba4cf.wixmp.com/templates/image/5bf41cca049f03cdc7e842db2201172d6cc1a6b173e8db293a3b880ecc5836561616582409012.jpg"
-            />
-          </div>
           <div className="content">
             <h2 className="title3"> Free</h2>
             <p className="details3">
@@ -162,7 +142,7 @@ function LandingPage() {
             <a href="/contact">Contact</a>
           </li>
         </ul>
-        <p class="copyright">© sheets-apify. All rights reserved.</p>
+        <p className="copyright">© sheets-apify. All rights reserved.</p>
       </footer>
     </div>
   );

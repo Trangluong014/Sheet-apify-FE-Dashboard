@@ -217,6 +217,8 @@ code {
 }
 .menuli {
   margin-right: 20px;
+}
+.menuli a {
   text-decoration: none !important;
   color: #fff;
 }
@@ -232,8 +234,7 @@ code {
 .details3 {
   color: #fff;
   padding-bottom: 1em;
-  text-align: center;
-  padding-left: 1em;
+  text-align: left;
   padding-right: 1em;
 }
 .pro-features {
@@ -252,4 +253,9 @@ code {
 
 #highlight {
   background: none;
+}
+
+.content {
+  padding-top: 2rem;
+  padding-left: 1.5rem;
 }

@@ -88,7 +88,10 @@ function MainHeader() {
                 onClose={handleCloseNavMenu}
               >
                 <MenuItem key="account" onClick={handleCloseNavMenu}>
-                  <Card sx={{ width: 300 }}>
+                  <Card
+                    sx={{ width: 300, bgcolor: "transparent" }}
+                    elevation={0}
+                  >
                     <CardContent>
                       <ForumIcon />
                       <Typography color="text.secondary" gutterBottom>
@@ -109,7 +112,10 @@ function MainHeader() {
                   </Card>
                 </MenuItem>
                 <MenuItem key="dashboard" onClick={handleCloseNavMenu}>
-                  <Card sx={{ width: 300 }}>
+                  <Card
+                    sx={{ width: 300, bgcolor: "transparent" }}
+                    elevation={0}
+                  >
                     <CardContent>
                       <ArticleIcon />
                       <Typography color="text.secondary" gutterBottom>
@@ -135,7 +141,10 @@ function MainHeader() {
                   </Card>
                 </MenuItem>
                 <MenuItem key="help" onClick={handleCloseNavMenu}>
-                  <Card sx={{ width: 300 }}>
+                  <Card
+                    sx={{ width: 300, bgcolor: "transparent" }}
+                    elevation={0}
+                  >
                     <CardContent>
                       <Typography color="text.secondary" gutterBottom>
                         Email
