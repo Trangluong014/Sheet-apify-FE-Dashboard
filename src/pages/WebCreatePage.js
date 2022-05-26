@@ -37,8 +37,12 @@ import apiService from "../app/apiService";
 import { useNavigate } from "react-router-dom";
 import { TEMPLATE_OPTIONS } from "../app/constants";
 import MonacoEditor from "../components/MonacoEditor";
+import ConfigurationEditor, {
+  filterAddtionalConfig,
+} from "../components/ConfigurationEditor";
 
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { deepmerge } from "@mui/utils";
 
 const URL_REGEX =
   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
@@ -56,7 +60,8 @@ const WebsiteSchema = Yup.object().shape({
     .trim(),
   ranges: Yup.array(Yup.string().trim()).required("Data Range is required"),
   template: Yup.string().required("Template is required").trim(),
-  config: Yup.string().trim(),
+  config: Yup.object(),
+  additionalConfig: Yup.string().trim(),
 });
 
 const defaultValues = {
@@ -65,7 +70,8 @@ const defaultValues = {
   spreadsheetUrl: "",
   ranges: [],
   template: "template2",
-  config: "{}",
+  config: {},
+  additionalConfig: "{}",
 };
 
 function WebCreatePage() {
@@ -76,6 +82,7 @@ function WebCreatePage() {
   const [step, setStep] = useState(0);
   const logoInputRef = useRef(null);
   const [logoInput, setLogoInput] = useState("");
+  const [templateConfig, setTemplateConfig] = useState({});
 
   const {
     handleSubmit,
@@ -94,15 +101,29 @@ function WebCreatePage() {
       if (name === "template") {
         const template = TEMPLATE_OPTIONS[value.template];
         if (template) {
-          setValue("config", template.defaultConfig || "{}", {
+          const configTemplate = template.configTemplate || {};
+          setTemplateConfig(configTemplate);
+          setValue("config", template.defaultConfig, {
             shouldValidate: true,
             shouldDirty: true,
           });
+          setValue(
+            "additionalConfig",
+            JSON.stringify(
+              filterAddtionalConfig(template.defaultConfig, configTemplate),
+              null,
+              2
+            ) || "{}",
+            {
+              shouldValidate: true,
+              shouldDirty: true,
+            }
+          );
         }
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, setValue]);
+  }, [watch, setValue, setTemplateConfig]);
 
   const navigate = useNavigate();
   const [ranges, setRanges] = useState([]);
@@ -170,10 +191,15 @@ function WebCreatePage() {
       };
       const submitData = async () => {
         try {
+          const merged = deepmerge(
+            tryParse(data.additionalConfig),
+            data.config || {},
+            { clone: true }
+          );
           const createData = {
             ...data,
             config: {
-              ...tryParse(data.config),
+              ...merged,
               logo: logoInput,
             },
           };
@@ -384,6 +410,19 @@ function WebCreatePage() {
                     </Typography>
                     <Controller
                       name="config"
+                      control={control}
+                      render={({
+                        field: { ...field },
+                        fieldState: { error },
+                      }) => (
+                        <ConfigurationEditor
+                          {...field}
+                          template={templateConfig}
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="additionalConfig"
                       control={control}
                       render={({
                         field: { ...field },

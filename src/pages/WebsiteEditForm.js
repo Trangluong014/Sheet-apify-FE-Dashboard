@@ -43,7 +43,7 @@ import {
   getSingleWebsite,
   deleteSingleWebsite,
 } from "../features/websites/websiteSlice";
-import { getWebsiteUrl } from "../app/constants";
+import { getWebsiteUrl, TEMPLATE_OPTIONS } from "../app/constants";
 import * as Yup from "yup";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -56,6 +56,10 @@ import apiService from "../app/apiService";
 import LinkIcon from "@mui/icons-material/Link";
 import { yupResolver } from "@hookform/resolvers/yup";
 import MonacoEditor from "../components/MonacoEditor";
+import ConfigurationEditor, {
+  filterAddtionalConfig,
+} from "../components/ConfigurationEditor";
+import { deepmerge } from "@mui/utils";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -86,7 +90,8 @@ function a11yProps(index) {
 const WebsiteSchema = Yup.object().shape({
   name: Yup.string().required("Display name is required").trim(),
   ranges: Yup.array(Yup.string().trim()).required("Data Range is required"),
-  config: Yup.string().trim(),
+  config: Yup.object(),
+  additionalConfig: Yup.string().trim(),
 });
 
 function WebsiteEditForm({ websiteId, website, ranges }) {
@@ -103,14 +108,26 @@ function WebsiteEditForm({ websiteId, website, ranges }) {
     dispatch(getSingleWebsite(params));
   }, [params, dispatch]);
 
+  const websiteTemplate = useMemo(() => {
+    return TEMPLATE_OPTIONS[website?.template] || {};
+  }, [website]);
+
   const websiteConfig = useMemo(() => {
     const { logo, ...config } = website.config || {};
-    return JSON.stringify(config);
+    const configTemplate = websiteTemplate.configTemplate || {};
+
+    return JSON.stringify(
+      filterAddtionalConfig(websiteTemplate.config, configTemplate),
+      null,
+      2
+    );
   }, [website]);
+
   const defaultValues = {
     name: website.name || "",
     ranges: website.ranges || [],
-    config: websiteConfig,
+    config: website.config || {},
+    additionalConfig: websiteConfig,
   };
   console.log("defaultValues", defaultValues);
 
@@ -130,12 +147,24 @@ function WebsiteEditForm({ websiteId, website, ranges }) {
   const onSubmit = useCallback(
     (data) => {
       const submitData = async () => {
+        const tryParse = (str) => {
+          try {
+            return JSON.parse(str);
+          } catch {
+            return {};
+          }
+        };
         try {
+          const merged = deepmerge(
+            tryParse(data.additionalConfig),
+            data.config || {},
+            { clone: true }
+          );
           const patchData = {
             name: data.name,
             ranges: data.ranges,
             config: {
-              ...JSON.parse(data.config),
+              ...merged,
               logo: logoInput || website?.config?.logo,
             },
           };
@@ -307,6 +336,16 @@ function WebsiteEditForm({ websiteId, website, ranges }) {
                 </Typography>
                 <Controller
                   name="config"
+                  control={control}
+                  render={({ field: { ...field }, fieldState: { error } }) => (
+                    <ConfigurationEditor
+                      {...field}
+                      template={websiteTemplate?.configTemplate || {}}
+                    />
+                  )}
+                />
+                <Controller
+                  name="additionalConfig"
                   control={control}
                   render={({ field: { ...field }, fieldState: { error } }) => (
                     <FormControl fullWidth sx={{ m: 1 }} variant="standard">
