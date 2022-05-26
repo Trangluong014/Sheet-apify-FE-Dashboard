@@ -1,12 +1,21 @@
+import { Box, CircularProgress } from "@mui/material";
 import React from "react";
 import "../components/LoadingScreen.css";
 
 function LoadingScreen() {
   return (
-    <div id="loading-wrapper">
-      <div id="loading-text">LOADING</div>
-      <div id="loading-content"></div>
-    </div>
+    <Box
+      sx={{
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <CircularProgress />
+    </Box>
   );
 }
 

@@ -21,28 +21,28 @@ const THEME_OPTIONS = {
         __meta: {
           label: "Main",
           type: "color",
-          defaulValue: "#1976d2",
+          defaultValue: "#1976d2",
         },
       },
       light: {
         __meta: {
           label: "Light",
           type: "color",
-          defaulValue: "#42a5f5",
+          defaultValue: "#42a5f5",
         },
       },
       dark: {
         __meta: {
           label: "Dark",
           type: "color",
-          defaulValue: "#1565c0",
+          defaultValue: "#1565c0",
         },
       },
       constrastText: {
         __meta: {
           label: "Contrast Text",
           type: "color",
-          defaulValue: "#fff",
+          defaultValue: "#ffffff",
         },
       },
     },
@@ -54,28 +54,28 @@ const THEME_OPTIONS = {
         __meta: {
           label: "Main",
           type: "color",
-          defaulValue: "#9c27b0",
+          defaultValue: "#9c27b0",
         },
       },
       light: {
         __meta: {
           label: "Light",
           type: "color",
-          defaulValue: "#ba68c8",
+          defaultValue: "#ba68c8",
         },
       },
       dark: {
         __meta: {
           label: "Dark",
           type: "color",
-          defaulValue: "#7b1fa2",
+          defaultValue: "#7b1fa2",
         },
       },
       constrastText: {
         __meta: {
           label: "Contrast Text",
           type: "color",
-          defaulValue: "#fff",
+          defaultValue: "#ffffff",
         },
       },
     },
@@ -88,14 +88,14 @@ const THEME_OPTIONS = {
         __meta: {
           label: "Default background color",
           type: "color",
-          defaulValue: "#fff",
+          defaultValue: "#ffffff",
         },
       },
       paper: {
         __meta: {
           label: "Paper background color",
           type: "color",
-          defaulValue: "#fff",
+          defaultValue: "#ffffff",
         },
       },
     },
@@ -109,14 +109,14 @@ const THEME_OPTIONS = {
         __meta: {
           label: "Primary text color",
           type: "color",
-          defaulValue: "rgba(0,0,0,0.87)",
+          defaultValue: "rgba(0,0,0,0.87)",
         },
       },
       secondary: {
         __meta: {
           label: "Secondary text color",
           type: "color",
-          defaulValue: "rgba(0,0,0,0.6)",
+          defaultValue: "rgba(0,0,0,0.6)",
         },
       },
     },

@@ -64,17 +64,27 @@ const WebsiteSchema = Yup.object().shape({
   additionalConfig: Yup.string().trim(),
 });
 
-const defaultValues = {
-  websiteId: "",
-  name: "",
-  spreadsheetUrl: "",
-  ranges: [],
-  template: "template2",
-  config: {},
-  additionalConfig: "{}",
-};
+const DEFAULT_TEMPLATE = "template2";
 
 function WebCreatePage() {
+  const defaultTemplate = TEMPLATE_OPTIONS[DEFAULT_TEMPLATE];
+  const [templateConfig, setTemplateConfig] = useState(
+    defaultTemplate.configTemplate
+  );
+  const defaultValues = {
+    websiteId: "",
+    name: "",
+    spreadsheetUrl: "",
+    ranges: [],
+    template: DEFAULT_TEMPLATE,
+    config: defaultTemplate.defaultConfig,
+    additionalConfig:
+      JSON.stringify(
+        filterAddtionalConfig(defaultTemplate.defaultConfig, templateConfig),
+        null,
+        2
+      ) || "{}",
+  };
   const methods = useForm({
     resolver: yupResolver(WebsiteSchema),
     defaultValues,
@@ -82,7 +92,6 @@ function WebCreatePage() {
   const [step, setStep] = useState(0);
   const logoInputRef = useRef(null);
   const [logoInput, setLogoInput] = useState("");
-  const [templateConfig, setTemplateConfig] = useState({});
 
   const {
     handleSubmit,

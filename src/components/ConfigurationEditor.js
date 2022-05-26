@@ -121,10 +121,10 @@ function ConfigurationLevel({ levelKey, template, nodeId, value, onChange }) {
   const { __meta: meta, ...rest } = template;
   const { description, type, defaultValue } = meta || {};
   const displayLabel = meta?.label || _capitalize(levelKey);
-
   const renderByType = (type) => {
     switch (type) {
       case "color":
+        // console.log(type, value, defaultValue, meta);
         return [
           "action",
           <input
